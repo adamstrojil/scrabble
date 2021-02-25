@@ -1,2 +1,2 @@
 export { Field } from "./Field"
-export { Letter } from "./Letter"
+export { BoardRowContainer } from "./BoardRowContainer"

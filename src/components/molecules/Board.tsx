@@ -1,37 +1,42 @@
 import React from "react";
 
-import styled from "styled-components";
 import { BoardField } from "../molecules";
 
 import { BoardType, Coordinates } from "../../types";
+import { BoardRowContainer } from "../atoms";
 
 type Props = {
   fields: BoardType;
-  moveLetter: (from: Coordinates, to: Coordinates) => void
+  moveLetter: (from: Coordinates, to: Coordinates) => void;
+  moveLetterFromStand: (from: number, to: Coordinates) => void;
 };
 
-const Container = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: #191a1a; /*  */
-`;
-
-export function Board({fields,moveLetter}: Props) {
- 
+export function Board({ fields, moveLetter, moveLetterFromStand }: Props) {
   return (
     <>
       <div style={{ margin: "50px" }}>
         {fields.map((
-          row, rowIndex //Board
+          //Board
+          row,
+          rowIndex
         ) => (
-          <Container>
+          <BoardRowContainer key={rowIndex}>
             {row.map((
-              letter, colIndex  //row
+              //row
+              letter,
+              colIndex
             ) => (
-              <BoardField moveLetter={moveLetter} coordinates={{row: rowIndex, col: colIndex}}>{letter}</BoardField>
+              <BoardField
+                canMove={false}
+                key={colIndex}
+                moveLetter={moveLetter}
+                moveLetterFromStand={moveLetterFromStand}
+                coordinates={{ row: rowIndex, col: colIndex }}
+              >
+                {letter}
+              </BoardField>
             ))}
-          </Container>
+          </BoardRowContainer>
         ))}
       </div>
     </>
