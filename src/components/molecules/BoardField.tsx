@@ -2,28 +2,27 @@ import React, { useRef } from "react";
 import { useDrag, useDrop } from "react-dnd";
 
 import { ItemTypes } from "../../types/dragTypes";
-import { Coordinates, Letter } from "../../types";
+import { Letter } from "../../types";
 import { Field } from "../atoms";
 
 type Props = {
-  coordinates: Coordinates;
+  coordinate: number;
   children: Letter;
-  moveLetter: (from: Coordinates, to: Coordinates) => void;
-  moveLetterFromStand: (from: number, to: Coordinates) => void;
+  moveLetterOnBoard: (from: number, to: number) => void;
+  moveLetterFromStand: (from: number, to: number) => void;
   canMove: boolean;
 };
 
 export function BoardField({
-  moveLetter,
+  moveLetterOnBoard,
   moveLetterFromStand,
-  coordinates,
-  coordinates: { row, col },
+  coordinate,
   children: { letter, canMove },
 }: Props) {
   const ref = useRef(null);
 
   const [{ isDragging, item }, drag] = useDrag({
-    item: { type: ItemTypes.LETTER, coordinates, fromStand: false },
+    item: { type: ItemTypes.LETTER, coordinate, fromStand: false },
     collect: (monitor) => ({
       isDragging: !!monitor.isDragging(),
       item: monitor.getItem(),
@@ -35,8 +34,8 @@ export function BoardField({
     accept: ItemTypes.LETTER,
     drop: () =>
       item.fromStand
-        ? moveLetterFromStand(item.index, { row, col })
-        : moveLetter(item.coordinates, { row, col }),
+        ? moveLetterFromStand(item.coordinate, coordinate)
+        : moveLetterOnBoard(item.coordinate, coordinate),
     collect: (monitor) => ({
       isOver: !!monitor.isOver(),
     }),

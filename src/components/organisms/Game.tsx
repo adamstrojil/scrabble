@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-import { BoardRow, BoardType, Coordinates, Letter } from "../../types";
+import { BoardType, Letter } from "../../types";
 import { Board, Stand } from "../molecules";
 
 type Props = {};
@@ -13,21 +13,7 @@ const createLetter = (letter: string, canMove: boolean): Letter => {
   };
 };
 
-const STARTING_FIELDS: BoardType = Array(15)
-  .fill(false)
-  .map((_row, index) =>
-    index === 7
-      ? [
-          ...Array(5).fill(createLetter("", false)),
-          createLetter("B", false),
-          createLetter("I", false),
-          createLetter("X", false),
-          createLetter("S", false),
-          createLetter("O", false),
-          ...Array(5).fill(createLetter("", false)),
-        ]
-      : new Array(15).fill(createLetter("", false))
-  );
+const STARTING_FIELDS: BoardType = Array(225).fill(createLetter("", false));
 
 const DEFAULT_STAND_LETTERS = [
   createLetter("O", true),
@@ -45,34 +31,48 @@ export function Game(props: Props) {
     DEFAULT_STAND_LETTERS
   );
 
-  const moveLetter = (from: Coordinates, to: Coordinates) => {
-    const letter = fields[from.row][from.col];
-
+  const moveLetterOnBoard = (from: number, to: number) => {
+    const letter = fields[from];
     let newBoard: BoardType = [...fields];
-    newBoard[from.row][from.col] = createLetter("", false);
-    newBoard[to.row][to.col] = letter;
-
+    newBoard[from] = createLetter("", false);
+    newBoard[to] = letter;
     setFields(newBoard);
   };
 
-  const moveLetterFromStand = (from: number, to: Coordinates) => {
+  const moveLetterFromStand = (from: number, to: number) => {
     const letter = currentStandLetters[from];
-
-    let newStand: BoardRow = [...currentStandLetters];
+    let newStand: BoardType = [...currentStandLetters];
     let newBoard: BoardType = [...fields];
     newStand[from] = createLetter("", false);
-    newBoard[to.row][to.col] = letter;
+    newBoard[to] = letter;
 
     setCurrentStandLetters(newStand);
     setFields(newBoard);
   };
 
+  const moveLetterToStand = (from: number, to: number) => {
+    const letter = fields[from];
+    let newStand: BoardType = [...currentStandLetters];
+    let newBoard: BoardType = [...fields];
+    newStand[to] = letter;
+    newBoard[from] = createLetter("", false);
+
+    setCurrentStandLetters(newStand);
+    setFields(newBoard);
+  };
+
+  const moveLetterOnStand = (from: number, to: number) => {
+    const letter = currentStandLetters[from];
+    let newStand: BoardType = [...currentStandLetters];
+    newStand[from] = createLetter("", false);
+    newStand[to] = letter;
+    setCurrentStandLetters(newStand);
+  };
+
   const lockBoardLetters = () => {
-    let lockedFields = [...fields]
-    lockedFields.forEach((row) => {
-      row.forEach((field) => {
-        field.canMove = false;
-      });
+    let lockedFields = [...fields];
+    lockedFields.forEach((field) => {
+      field.canMove = false;
     });
     setFields(lockedFields);
   };
@@ -81,10 +81,15 @@ export function Game(props: Props) {
     <>
       <Board
         fields={fields}
-        moveLetter={moveLetter}
+        moveLetterOnBoard={moveLetterOnBoard}
         moveLetterFromStand={moveLetterFromStand}
       />
-      <Stand letters={currentStandLetters} moveLetter={moveLetterFromStand} />
+      <Stand
+        letters={currentStandLetters}
+        moveLetterOnBoard={moveLetterFromStand}
+        moveLetterToStand={moveLetterToStand}
+        moveLetterOnStand={moveLetterOnStand}
+      />
       <button
         onClick={() => {
           lockBoardLetters();

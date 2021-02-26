@@ -1,44 +1,44 @@
 import React from "react";
 
+import { BoardType } from "../../types";
 import { BoardField } from "../molecules";
-
-import { BoardType, Coordinates } from "../../types";
 import { BoardRowContainer } from "../atoms";
 
 type Props = {
   fields: BoardType;
-  moveLetter: (from: Coordinates, to: Coordinates) => void;
-  moveLetterFromStand: (from: number, to: Coordinates) => void;
+  moveLetterOnBoard: (from: number, to: number) => void;
+  moveLetterFromStand: (from: number, to: number) => void;
+  // moveLetterToStand: (from: number, to: number) => void;
 };
 
-export function Board({ fields, moveLetter, moveLetterFromStand }: Props) {
+const NUMBER_OF_ROWS = 15;
+const FIELDS_PER_ROW = 15;
+const ROWS = Array(NUMBER_OF_ROWS).fill(false);
+
+export function Board({ fields, moveLetterOnBoard, moveLetterFromStand }: Props) {
   return (
-    <>
-      <div style={{ margin: "50px" }}>
-        {fields.map((
-          //Board
-          row,
-          rowIndex
-        ) => (
-          <BoardRowContainer key={rowIndex}>
-            {row.map((
-              //row
-              letter,
-              colIndex
-            ) => (
+    <div style={{ margin: "50px" }}>
+      {ROWS.map((_row, rowIndex) => (
+        <BoardRowContainer key={rowIndex}>
+          {fields
+            .slice(
+              rowIndex * NUMBER_OF_ROWS,
+              rowIndex * NUMBER_OF_ROWS + FIELDS_PER_ROW
+            )
+            .map((letter, fieldIndex) => (
               <BoardField
                 canMove={false}
-                key={colIndex}
-                moveLetter={moveLetter}
+                key={fieldIndex}
+                moveLetterOnBoard={moveLetterOnBoard}
                 moveLetterFromStand={moveLetterFromStand}
-                coordinates={{ row: rowIndex, col: colIndex }}
+                // moveLetterToStand={moveLetterToStand}
+                coordinate={rowIndex * NUMBER_OF_ROWS + fieldIndex}
               >
                 {letter}
               </BoardField>
             ))}
-          </BoardRowContainer>
-        ))}
-      </div>
-    </>
+        </BoardRowContainer>
+      ))}
+    </div>
   );
 }
