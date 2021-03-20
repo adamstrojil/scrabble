@@ -11,7 +11,7 @@ const FieldBox = styled.div`
   margin: 5px;
   background: #262828;
   display: flex;
-  font-size: 4vw;
+  font-size: 2.2rem;
   justify-content: center;
   align-items: center;
   text-align: center;

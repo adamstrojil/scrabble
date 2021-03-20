@@ -1,102 +1,152 @@
-import React, { useState } from "react";
+import { connect } from "react-redux";
 
-import { BoardType, Letter } from "../../types";
+import { Bonus, Letter } from "../../types";
+import { pathToBoard, pathToStand } from "../../redux/paths";
+import { StoreState } from "../../types/StoreState";
+import { createLetter } from "../../utils/gameUtils";
+import {
+  boardFields,
+} from "../../features/Board/selectors";
+import {
+  removeLetterFromBoard,
+  addLetterToBoard,
+  updateLetterValues,
+  lockLettersOnBoard
+} from "../../features/Board/actions";
+import { addLeterToStand, removeLetterFromStand } from "../../features/Stand/actions";
+import { fields as standFields} from "../../features/Stand/selectors";
 import { Board, Stand } from "../molecules";
 
-type Props = {};
-
-const createLetter = (letter: string, canMove: boolean): Letter => {
-  return {
-    letter,
-    canMove,
-    value: letter === "" ? 0 : 1,
-  };
+type StateProps = {
+  boardFields: Array<Letter>;
+  standFields: Array<Letter>;
 };
 
-const STARTING_FIELDS: BoardType = Array(225).fill(createLetter("", false));
+type DispatchProps = {
+  removeLetterFromBoard: (coordinate: number) => void;
+  addLetterToBoard: (coordinate: number, letter: Letter) => void;
+  removeLetterFromStand:(coordinate: number) => void;
+  addLeterToStand: (coordinate: number, letter: Letter) => void;
+  lockLettersOnBoard: () => void;
+  updateLetterValues: () => void;
+};
 
-const DEFAULT_STAND_LETTERS = [
-  createLetter("O", true),
-  createLetter("Z", true),
-  createLetter("I", true),
-  createLetter("U", true),
-  createLetter("K", true),
-  createLetter("Y", true),
-  createLetter("Č", true),
-];
+type Props = StateProps & DispatchProps;
 
-export function Game(props: Props) {
-  const [fields, setFields] = useState<BoardType>(STARTING_FIELDS);
-  const [currentStandLetters, setCurrentStandLetters] = useState<Array<Letter>>(
-    DEFAULT_STAND_LETTERS
-  );
+function GameBase({
+  boardFields,
+  standFields,
+  removeLetterFromBoard,
+  addLetterToBoard,
+  removeLetterFromStand,
+  addLeterToStand,
+  lockLettersOnBoard,
+  updateLetterValues
+}: Props) {
+  const applyBonus = (originCoordinate: number, bonus: Bonus) => {
+  //   console.log(
+  //     `---------------field ${originCoordinate} would like to apply ${bonus} bonus--------------`
+  //   );
+
+  //   const doubleLetter = (fields: any, coordinate: any): any => {
+  //     const value = fields[coordinate].currentValue;
+  //     const doubleValue = value * 2;
+  //     fields[coordinate].currentValue = doubleValue;
+  //     return fields;
+  //   };
+
+  //   switch (bonus) {
+  //     case "double-letter":
+  //       setFields((fields) => doubleLetter(fields, originCoordinate));
+  //       break;
+  //     case "double-word":
+  //       setFields((fields) => doubleLetter(fields, originCoordinate));
+  //       let i = 1;
+  //       while (fields[originCoordinate - i]?.letter) {
+  //         setFields((fields) => doubleLetter(fields, originCoordinate - i));
+  //         i++;
+  //       }
+  //       i = 1;
+  //       while (fields[originCoordinate + i]?.letter) {
+  //         setFields((fields) => doubleLetter(fields, originCoordinate + i));
+  //         i++;
+  //       }
+  //       break;
+  //     case "none":
+  //     default:
+  //       setFields((fields) => {
+  //         let newfields = [...fields];
+  //         const value = newfields[originCoordinate].baseValue;
+  //         newfields[originCoordinate].currentValue = value;
+  //         return newfields;
+  //       });
+  //       break;
+  //   }
+   };
 
   const moveLetterOnBoard = (from: number, to: number) => {
-    const letter = fields[from];
-    let newBoard: BoardType = [...fields];
-    newBoard[from] = createLetter("", false);
-    newBoard[to] = letter;
-    setFields(newBoard);
+    const letter = {...boardFields[from]};
+    removeLetterFromBoard(from);
+    addLetterToBoard(to,letter);
   };
 
   const moveLetterFromStand = (from: number, to: number) => {
-    const letter = currentStandLetters[from];
-    let newStand: BoardType = [...currentStandLetters];
-    let newBoard: BoardType = [...fields];
-    newStand[from] = createLetter("", false);
-    newBoard[to] = letter;
-
-    setCurrentStandLetters(newStand);
-    setFields(newBoard);
+    const letter = {...standFields[from]};
+    removeLetterFromStand(from);
+    addLetterToBoard(to,letter);
   };
 
   const moveLetterToStand = (from: number, to: number) => {
-    const letter = fields[from];
-    let newStand: BoardType = [...currentStandLetters];
-    let newBoard: BoardType = [...fields];
-    newStand[to] = letter;
-    newBoard[from] = createLetter("", false);
-
-    setCurrentStandLetters(newStand);
-    setFields(newBoard);
+    const letter = {...boardFields[from]};
+    removeLetterFromBoard(from);
+    addLeterToStand(to,letter);
   };
 
   const moveLetterOnStand = (from: number, to: number) => {
-    const letter = currentStandLetters[from];
-    let newStand: BoardType = [...currentStandLetters];
-    newStand[from] = createLetter("", false);
-    newStand[to] = letter;
-    setCurrentStandLetters(newStand);
-  };
-
-  const lockBoardLetters = () => {
-    let lockedFields = [...fields];
-    lockedFields.forEach((field) => {
-      field.canMove = false;
-    });
-    setFields(lockedFields);
+    const letter = {...standFields[from]};
+    removeLetterFromStand(from);
+    addLeterToStand(to,letter);
   };
 
   return (
     <>
-      <Board
-        fields={fields}
-        moveLetterOnBoard={moveLetterOnBoard}
-        moveLetterFromStand={moveLetterFromStand}
-      />
+      {/* <h1>SCRABBLE</h1> */}
+      <button
+        onClick={updateLetterValues}
+        // onClick={lockLettersOnBoard}
+      >
+        Confirm
+      </button>
       <Stand
-        letters={currentStandLetters}
+        letters={standFields}
         moveLetterOnBoard={moveLetterFromStand}
         moveLetterToStand={moveLetterToStand}
         moveLetterOnStand={moveLetterOnStand}
       />
-      <button
-        onClick={() => {
-          lockBoardLetters();
-        }}
-      >
-        Confirm
-      </button>
+      <Board
+        fields={boardFields}
+        moveLetterOnBoard={moveLetterOnBoard}
+        moveLetterFromStand={moveLetterFromStand}
+        applyBonus={applyBonus}
+      />
     </>
   );
 }
+
+const mapStateToProps = (state: StoreState): StateProps => {
+  return {
+    boardFields: boardFields(pathToBoard(state)),
+    standFields: standFields(pathToStand(state)),
+  };
+};
+
+const mapDispatchToProps: DispatchProps = {
+  removeLetterFromBoard,
+  addLetterToBoard,
+  removeLetterFromStand,
+  addLeterToStand,
+  lockLettersOnBoard,
+  updateLetterValues
+};
+
+export const Game = connect(mapStateToProps, mapDispatchToProps)(GameBase);

@@ -15,7 +15,7 @@ type Props = {
 
 export function StandField({
   index,
-  children,
+  children: {baseValue, letter},
   moveLetterToStand,
   moveLetterOnStand,
 }: Props) {
@@ -27,7 +27,7 @@ export function StandField({
       isDragging: !!monitor.isDragging(),
       item: monitor.getItem(),
     }),
-    canDrag: () => (children.letter === "" ? false : true),
+    canDrag: () => (letter === "" ? false : true),
   });
 
   const [, drop] = useDrop({
@@ -39,14 +39,24 @@ export function StandField({
     collect: (monitor) => ({
       isOver: !!monitor.isOver(),
     }),
-    canDrop: () => (children.letter === "" ? true : false),
+    canDrop: () => (letter === "" ? true : false),
   });
 
   drag(drop(ref));
 
   return (
     <Field ref={ref} isDragging={isDragging}>
-      {children.letter}
+      {letter}
+       <div
+        style={{
+          position: "absolute",
+          fontSize: ".8rem",
+          marginTop: "2rem",
+          marginLeft: "2.3rem",
+        }}
+      >
+        {baseValue ? baseValue : ""}
+      </div>
     </Field>
   );
 }
