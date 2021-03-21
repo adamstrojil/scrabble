@@ -10,15 +10,13 @@ type Props = {
   children: Letter;
   moveLetterOnBoard: (from: number, to: number) => void;
   moveLetterFromStand: (from: number, to: number) => void;
-  applyBonus: (coordinate: number, bonus: Bonus) => void;
   canMove: boolean;
-  bonus?: Bonus;
+  bonus?: Bonus | null;
 };
 
 export function BoardField({
   moveLetterOnBoard,
   moveLetterFromStand,
-  applyBonus,
   coordinate,
   children: { letter, canMove, currentValue },
   bonus = "none",
@@ -40,7 +38,6 @@ export function BoardField({
       item.fromStand
         ? moveLetterFromStand(item.coordinate, coordinate)
         : moveLetterOnBoard(item.coordinate, coordinate);
-        applyBonus(coordinate, bonus)
     },
     collect: (monitor) => ({
       isOver: !!monitor.isOver(),

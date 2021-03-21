@@ -5,7 +5,7 @@ import { pathToBoard, pathToStand } from "../../redux/paths";
 import { StoreState } from "../../types/StoreState";
 import { createLetter } from "../../utils/gameUtils";
 import {
-  boardFields,
+  boardFields, multipliers,
 } from "../../features/Board/selectors";
 import {
   removeLetterFromBoard,
@@ -20,6 +20,7 @@ import { Board, Stand } from "../molecules";
 type StateProps = {
   boardFields: Array<Letter>;
   standFields: Array<Letter>;
+  multipliers: Array<Bonus | null>
 };
 
 type DispatchProps = {
@@ -41,48 +42,9 @@ function GameBase({
   removeLetterFromStand,
   addLeterToStand,
   lockLettersOnBoard,
+  multipliers,
   updateLetterValues
 }: Props) {
-  const applyBonus = (originCoordinate: number, bonus: Bonus) => {
-  //   console.log(
-  //     `---------------field ${originCoordinate} would like to apply ${bonus} bonus--------------`
-  //   );
-
-  //   const doubleLetter = (fields: any, coordinate: any): any => {
-  //     const value = fields[coordinate].currentValue;
-  //     const doubleValue = value * 2;
-  //     fields[coordinate].currentValue = doubleValue;
-  //     return fields;
-  //   };
-
-  //   switch (bonus) {
-  //     case "double-letter":
-  //       setFields((fields) => doubleLetter(fields, originCoordinate));
-  //       break;
-  //     case "double-word":
-  //       setFields((fields) => doubleLetter(fields, originCoordinate));
-  //       let i = 1;
-  //       while (fields[originCoordinate - i]?.letter) {
-  //         setFields((fields) => doubleLetter(fields, originCoordinate - i));
-  //         i++;
-  //       }
-  //       i = 1;
-  //       while (fields[originCoordinate + i]?.letter) {
-  //         setFields((fields) => doubleLetter(fields, originCoordinate + i));
-  //         i++;
-  //       }
-  //       break;
-  //     case "none":
-  //     default:
-  //       setFields((fields) => {
-  //         let newfields = [...fields];
-  //         const value = newfields[originCoordinate].baseValue;
-  //         newfields[originCoordinate].currentValue = value;
-  //         return newfields;
-  //       });
-  //       break;
-  //   }
-   };
 
   const moveLetterOnBoard = (from: number, to: number) => {
     const letter = {...boardFields[from]};
@@ -112,8 +74,7 @@ function GameBase({
     <>
       {/* <h1>SCRABBLE</h1> */}
       <button
-        onClick={updateLetterValues}
-        // onClick={lockLettersOnBoard}
+        onClick={lockLettersOnBoard}
       >
         Confirm
       </button>
@@ -125,9 +86,9 @@ function GameBase({
       />
       <Board
         fields={boardFields}
+        multipliers={multipliers}
         moveLetterOnBoard={moveLetterOnBoard}
         moveLetterFromStand={moveLetterFromStand}
-        applyBonus={applyBonus}
       />
     </>
   );
@@ -136,6 +97,7 @@ function GameBase({
 const mapStateToProps = (state: StoreState): StateProps => {
   return {
     boardFields: boardFields(pathToBoard(state)),
+    multipliers: multipliers(pathToBoard(state)),
     standFields: standFields(pathToStand(state)),
   };
 };

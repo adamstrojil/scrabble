@@ -8,13 +8,13 @@ export type StandState = {
 
 const defaultState: StandState = {
   fields: [
-    createLetter("O", true),
-    createLetter("Z", true),
-    createLetter("I", true),
-    createLetter("U", true),
-    createLetter("K", true),
-    createLetter("Y", true),
-    createLetter("", false),
+    createLetter("Y", 2, true),
+    createLetter("Z", 2, true),
+    createLetter("Č", 2, true),
+    createLetter("I", 2, true),
+    createLetter("K", 2, true),
+    createLetter("O", 2, true),
+    createLetter("K", 2, true),
   ],
 };
 
@@ -38,14 +38,12 @@ export const standReducer = function (
         ...state,
         fields: state.fields.map((letter, index) => {
           return index === action.payload.coordinate
-            ? createLetter("", false)
+            ? createLetter("", 0, false)
             : letter;
         }),
       };
     }
     default: {
-      console.log("Stand def");
-
       return state;
     }
   }
