@@ -5,3 +5,6 @@ export const pathToBoard = (state: StoreState) =>
 
 export const pathToStand = (state: StoreState) =>
   state.stand;
+
+export const pathToLetterBag = (state: StoreState) =>
+  state.letterBag;

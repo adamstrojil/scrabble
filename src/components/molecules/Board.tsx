@@ -2,7 +2,7 @@ import React from "react";
 
 import { BoardType, Bonus } from "../../types";
 import { BoardField } from "../molecules";
-import { BoardRowContainer } from "../atoms";
+import { BoardRowContainer,BoardContainer } from "../atoms";
 
 type Props = {
   fields: BoardType;
@@ -23,7 +23,7 @@ export function Board({
   multipliers,
 }: Props) {
   return (
-    <div style={{ margin: "50px" }}>
+    <BoardContainer>
       {ROWS.map((_row, rowIndex) => (
         <BoardRowContainer key={rowIndex}>
           {fields
@@ -45,6 +45,6 @@ export function Board({
             ))}
         </BoardRowContainer>
       ))}
-    </div>
+    </BoardContainer>
   );
 }

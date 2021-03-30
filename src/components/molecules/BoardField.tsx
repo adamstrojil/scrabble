@@ -75,6 +75,34 @@ export function BoardField({
     </div>
   );
 
+  const triple = (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        fontSize: " 1rem",
+        color: "#7bca7e",
+      }}
+    >
+      <span>3x</span>
+      <span>letter</span>
+    </div>
+  );
+
+  const tripleWord = (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        fontSize: " 1rem",
+        color: "#00bb07",
+      }}
+    >
+      <span>3x</span>
+      <span>word</span>
+    </div>
+  );
+
   return (
     <Field ref={ref} isDragging={isDragging}>
       <span style={{ ...(canMove ? { color: "white" } : { color: "gray" }) }}>
@@ -92,6 +120,8 @@ export function BoardField({
       </div>
       {!currentValue && bonus === "double-letter" ? double : ""}
       {!currentValue && bonus === "double-word" ? doubleWord : ""}
+      {!currentValue && bonus === "triple-letter" ? triple : ""}
+      {!currentValue && bonus === "triple-word" ? tripleWord : ""}
     </Field>
   );
 }

@@ -3,7 +3,7 @@ import React from "react";
 import { StandField } from "../molecules";
 
 import { Letter } from "../../types";
-import { BoardRowContainer } from "../atoms";
+import { BoardContainer, BoardRowContainer } from "../atoms";
 
 type Props = {
   letters: Array<Letter>;
@@ -19,7 +19,7 @@ export function Stand({
   moveLetterOnStand,
 }: Props) {
   return (
-    <div style={{ margin: "50px" }}>
+    <BoardContainer>
       <BoardRowContainer>
         {letters.map((letter, index) => (
           <StandField
@@ -33,6 +33,6 @@ export function Stand({
           </StandField>
         ))}
       </BoardRowContainer>
-    </div>
+    </BoardContainer>
   );
 }
