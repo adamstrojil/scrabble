@@ -7,6 +7,6 @@ type Props = {
 };
 
 const BoardContainer = styled.div`
-  margin: 50px 700px 50px 50px;
+  margin: 50px 50px 50px 50px;
 `;
 export { BoardContainer };

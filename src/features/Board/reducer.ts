@@ -5,14 +5,31 @@ import { BoardAction } from "./actions";
 export type BoardState = {
   boardFields: Array<Letter>;
   multipliers: Array<Bonus | null>;
-  width: number,
-  height: number,
+  width: number;
+  height: number;
 };
 
-const dbl = [4, 42, 82];
+const dbl = [4, 43, 82];
 const tpl = [5, 48, 90];
 const tpw = [50, 31, 99];
-const dbw = [0, 2, 224, 210, 30, 55, 26, 80, 100, 222, 14];
+const dbw = [
+  0,
+  2,
+  12,
+  44,
+  224,
+  210,
+  30,
+  55,
+  26,
+  80,
+  100,
+  222,
+  14,
+  194,
+  212,
+  180,
+];
 
 const defaultState: BoardState = {
   width: 15,
@@ -34,7 +51,6 @@ const defaultState: BoardState = {
           : null;
       }),
   ],
-
 };
 
 export const boardReducer = function (
@@ -110,29 +126,39 @@ const newLetterValue = (
   return letter.baseValue * totalMultiplier;
 };
 
+const indexNotInPreviousRow = (index: number, boardWidth: number) =>
+  index >= 0 && index % boardWidth !== boardWidth - 1;
+
+const indexNotInNextRow = (index: number, boardWidth: number) =>
+  index < 255 && index % boardWidth !== 0;
+
+const fieldContainsLetter = (index: number, fields: Array<Letter>) =>
+  fields[index]?.letter !== "";
+
+const isValidIndex = (index: number, array: Array<any>) =>
+  index >= 0 && index < array.length;
+
 const wordMultiplyBonusFromLeft = (
   fields: Array<Letter>,
   currentIndex: number,
   boardWidth: number
 ): number => {
-  if (currentIndex % boardWidth === 0)
-    return dbw.includes(currentIndex) ? 2 : tpw.includes(currentIndex) ? 3 : 1;
+  let multiplierFromLeft = 1;
+  currentIndex--;
 
-  let checkingIndex = currentIndex - 1;
-  let total = 1;
   while (
-    checkingIndex % boardWidth !== 0 &&
-    fields[checkingIndex].letter !== ""
+    indexNotInPreviousRow(currentIndex, boardWidth) &&
+    fieldContainsLetter(currentIndex, fields)
   ) {
-    total *= dbw.includes(checkingIndex)
+    multiplierFromLeft *= dbw.includes(currentIndex)
       ? 2
-      : tpw.includes(checkingIndex)
+      : tpw.includes(currentIndex)
       ? 3
       : 1;
-    checkingIndex--;
+    currentIndex--;
   }
 
-  return total;
+  return multiplierFromLeft;
 };
 
 const wordMultiplyBonusFromRight = (
@@ -140,70 +166,66 @@ const wordMultiplyBonusFromRight = (
   currentIndex: number,
   boardWidth: number
 ): number => {
-  if (currentIndex % boardWidth === boardWidth - 1)
-    return dbw.includes(currentIndex) ? 2 : tpw.includes(currentIndex) ? 3 : 1;
-
-  let checkingIndex = currentIndex + 1;
-  let total = 1;
+  let multiplierFromRight = 1;
+  currentIndex++;
 
   while (
-    checkingIndex % boardWidth !== 0 &&
-    fields[checkingIndex].letter !== ""
+    indexNotInNextRow(currentIndex, boardWidth) &&
+    fieldContainsLetter(currentIndex, fields)
   ) {
-    total *= dbw.includes(checkingIndex)
+    multiplierFromRight *= dbw.includes(currentIndex)
       ? 2
-      : tpw.includes(checkingIndex)
+      : tpw.includes(currentIndex)
       ? 3
       : 1;
-    checkingIndex++;
+    currentIndex++;
   }
 
-  return total;
+  return multiplierFromRight;
 };
 
 const wordMultiplyBonusFromAbove = (
   fields: Array<Letter>,
   currentIndex: number,
-  boardHeight: number
+  boardWidth: number
 ): number => {
-  if (currentIndex < 15)
-    return dbw.includes(currentIndex) ? 2 : tpw.includes(currentIndex) ? 3 : 1;
+  let multiplierFromAbove = 1;
+  currentIndex -= boardWidth;
 
-  let checkingIndex = currentIndex - boardHeight;
-  let total = 1;
-
-  while (checkingIndex >= 0 && fields[checkingIndex].letter !== "") {
-    total *= dbw.includes(checkingIndex)
+  while (
+    isValidIndex(currentIndex, fields) &&
+    fieldContainsLetter(currentIndex, fields)
+  ) {
+    multiplierFromAbove *= dbw.includes(currentIndex)
       ? 2
-      : tpw.includes(checkingIndex)
+      : tpw.includes(currentIndex)
       ? 3
       : 1;
-    checkingIndex -= boardHeight;
+    currentIndex -= boardWidth;
   }
 
-  return total;
+  return multiplierFromAbove;
 };
 
 const wordMultiplyBonusFromBelow = (
   fields: Array<Letter>,
   currentIndex: number,
-  boardHeight: number
+  boardWidth: number
 ): number => {
-  // if (currentIndex > 15*boardHeight-15)
-  if (currentIndex > 208)
-    return dbw.includes(currentIndex) ? 2 : tpw.includes(currentIndex) ? 3 : 1;
+  let multiplierFromBelow = 1;
+  currentIndex += boardWidth;
 
-  let checkingIndex = currentIndex + boardHeight ;
-  let total = 1;
-
-  while (checkingIndex <= 0 && fields[checkingIndex].letter !== "") {
-    total *= dbw.includes(checkingIndex)
+  while (
+    isValidIndex(currentIndex, fields) &&
+    fieldContainsLetter(currentIndex, fields)
+  ) {
+    multiplierFromBelow *= dbw.includes(currentIndex)
       ? 2
-      : tpw.includes(checkingIndex)
+      : tpw.includes(currentIndex)
       ? 3
       : 1;
-    checkingIndex += boardHeight;
+    currentIndex += boardWidth;
   }
 
-  return total;
+  return multiplierFromBelow;
 };
